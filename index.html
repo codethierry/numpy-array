@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumPy Array Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>NumPy Array Generator</h1>
+            <p>Generate Python NumPy array code from a visual grid.</p>
+        </header>
+
+        <section class="reference-section">
+            <h2>NumPy Shortcuts</h2>
+            <div class="shortcuts-grid">
+                <div class="shortcut-item"><code>pi</code> <span>&rarr;</span> <code>np.pi</code></div>
+                <div class="shortcut-item"><code>sqrt(x)</code> <span>&rarr;</span> <code>np.sqrt(x)</code></div>
+                <div class="shortcut-item"><code>e</code> <span>&rarr;</span> <code>np.e</code></div>
+                <div class="shortcut-item"><code>sin(x)</code> <span>&rarr;</span> <code>np.sin(x)</code></div>
+                <div class="shortcut-item"><code>inf</code> <span>&rarr;</span> <code>np.inf</code></div>
+                <div class="shortcut-item"><code>cos(x)</code> <span>&rarr;</span> <code>np.cos(x)</code></div>
+                <div class="shortcut-item"><code>nan</code> <span>&rarr;</span> <code>np.nan</code></div>
+                <div class="shortcut-item"><code>exp(x)</code> <span>&rarr;</span> <code>np.exp(x)</code></div>
+            </div>
+        </section>
+
+        <section class="controls">
+            <div class="controls-inputs">
+                <div class="input-group">
+                    <label for="rows">Rows (m)</label>
+                    <input type="number" id="rows" min="1" value="3" aria-label="Number of rows">
+                </div>
+                <div class="input-group">
+                    <label for="cols">Columns (n)</label>
+                    <input type="number" id="cols" min="1" value="3" aria-label="Number of columns">
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="generate-btn" class="primary-btn">Generate</button>
+                <button id="reset-btn" class="secondary-btn">Reset</button>
+            </div>
+        </section>
+
+        <section class="grid-section">
+            <div id="grid-container" class="grid-container"></div>
+            <button id="submit-btn" class="primary-btn" style="display: none;">Submit</button>
+        </section>
+
+        <section id="output-section" class="output-section" style="display: none;">
+            <div class="output-header">
+                <h2>Generated Code</h2>
+                <button id="copy-btn" class="icon-btn" title="Copy to clipboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy
+                </button>
+            </div>
+            <pre><code id="output-code"></code></pre>
+        </section>
+
+        <footer>
+            <p>&copy; Thierry Kall, 2026</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
