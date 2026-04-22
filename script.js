@@ -8,14 +8,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const outputCode = document.getElementById('output-code');
     const rowsInput = document.getElementById('rows');
     const colsInput = document.getElementById('cols');
+    const modeDropdown = document.getElementById('mode-dropdown');
+    const dropdownTrigger = document.getElementById('dropdown-trigger');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    const currentModeText = document.getElementById('current-mode-text');
+    const shortcutsSection = document.getElementById('shortcuts-section');
 
     let currentRows = 0;
     let currentCols = 0;
+    let currentMode = 'numpy';
 
     generateBtn.addEventListener('click', generateGrid);
     resetBtn.addEventListener('click', resetApp);
-    submitBtn.addEventListener('click', generateNumpyCode);
+    submitBtn.addEventListener('click', generateCode);
     copyBtn.addEventListener('click', copyToClipboard);
+
+    // Custom Dropdown Logic
+    dropdownTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modeDropdown.classList.toggle('open');
+    });
+
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const value = item.getAttribute('data-value');
+            currentMode = value;
+            currentModeText.textContent = item.textContent;
+            
+            dropdownItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            modeDropdown.classList.remove('open');
+            handleModeChange();
+        });
+    });
+
+    document.addEventListener('click', () => {
+        modeDropdown.classList.remove('open');
+    });
+
+    function handleModeChange() {
+        // Shortcuts section now stays visible for both modes
+        
+        // Regenerate code if already visible
+        if (outputSection.style.display !== 'none') {
+            generateCode();
+        }
+    }
 
     function resetApp() {
         rowsInput.value = '3';
@@ -73,33 +113,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function generateNumpyCode() {
+    function generateCode() {
         if (currentRows === 0 || currentCols === 0) return;
 
         const cells = document.querySelectorAll('.grid-cell');
+        const mode = currentMode;
         let arrayData = [];
 
-        for (let i = 0; i < currentRows; i++) {
-            let rowData = [];
-            for (let j = 0; j < currentCols; j++) {
-                const index = i * currentCols + j;
-                let cellValue = cells[index].value.trim();
-                
-                if (cellValue === '') {
-                    cellValue = '0';
-                } else {
-                    const npRegex = /\b(np\.)?(pi|e|inf|nan|sqrt|sin|cos|tan|exp|log|arcsin|arccos|arctan)\b/g;
-                    cellValue = cellValue.replace(npRegex, 'np.$2');
+        if (mode === 'numpy') {
+            for (let i = 0; i < currentRows; i++) {
+                let rowData = [];
+                for (let j = 0; j < currentCols; j++) {
+                    const index = i * currentCols + j;
+                    let cellValue = cells[index].value.trim();
+                    
+                    if (cellValue === '') {
+                        cellValue = '0';
+                    } else {
+                        // Replace constants
+                        const constRegex = /\b(np\.)?(pi|inf|nan)\b/g;
+                        cellValue = cellValue.replace(constRegex, 'np.$2');
+                        
+                        // Replace functions and ensure closed parentheses
+                        const funcRegex = /\b(np\.)?(sqrt|sin|cos|tan|exp|log|arcsin|arccos|arctan)\(([^)]*)(?:\)|$)/g;
+                        cellValue = cellValue.replace(funcRegex, 'np.$2($3)');
+                    }
+                    rowData.push(cellValue);
                 }
-                
-                rowData.push(cellValue);
+                arrayData.push(`[${rowData.join(', ')}]`);
             }
-            arrayData.push(`[${rowData.join(', ')}]`);
+            const numpyCode = `np.array([\n    ${arrayData.join(',\n    ')}\n])`;
+            outputCode.textContent = numpyCode;
+        } else {
+            // LaTeX mode
+            let latexRows = [];
+            for (let i = 0; i < currentRows; i++) {
+                let rowData = [];
+                for (let j = 0; j < currentCols; j++) {
+                    const index = i * currentCols + j;
+                    let cellValue = cells[index].value.trim();
+                    
+                    if (cellValue === '') {
+                        cellValue = '0';
+                    } else {
+                        // Basic LaTeX replacements
+                        cellValue = cellValue
+                            .replace(/\b(np\.)?pi\b/g, '\\pi')
+                            .replace(/\b(np\.)?inf\b/g, '\\infty')
+                            .replace(/\b(np\.)?nan\b/g, '\\text{NaN}')
+                            .replace(/\b(np\.)?sqrt\(([^)]*)(?:\)|$)/g, '\\sqrt{$2}')
+                            .replace(/\b(np\.)?sin\(([^)]*)(?:\)|$)/g, '\\sin($2)')
+                            .replace(/\b(np\.)?cos\(([^)]*)(?:\)|$)/g, '\\cos($2)')
+                            .replace(/\b(np\.)?tan\(([^)]*)(?:\)|$)/g, '\\tan($2)')
+                            .replace(/\b(np\.)?exp\(([^)]*)(?:\)|$)/g, 'e^{$2}')
+                            .replace(/\b(np\.)?log\(([^)]*)(?:\)|$)/g, '\\ln($2)')
+                            .replace(/\*/g, ' \\cdot ');
+                    }
+                    rowData.push(cellValue);
+                }
+                latexRows.push(rowData.join(' & '));
+            }
+            const latexCode = `$$\n\\begin{pmatrix}\n    ${latexRows.join(' \\\\\n    ')}\n\\end{pmatrix}\n$$`;
+            outputCode.textContent = latexCode;
         }
 
-        const numpyCode = `np.array([\n    ${arrayData.join(',\n    ')}\n])`;
-
-        outputCode.textContent = numpyCode;
         outputSection.style.display = 'block';
         
         // Reset copy button state
