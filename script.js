@@ -273,10 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 latexRows.push(rowData.join(' & '));
             }
             const isAugmented = augmentedCheckbox.checked && currentCols > 1;
-            const latexEnv = isAugmented ? 'augmat' : 'pmatrix';
-            const envArg = isAugmented ? `{${currentCols - 1}}` : '';
-
-            const latexCode = `$$\n\\begin{${latexEnv}}${envArg}\n    ${latexRows.join(' \\\\\n    ')}\n\\end{${latexEnv}}\n$$`;
+            const useSquareBrackets = currentRows > 3;
+            let latexCode = '';
+            
+            if (isAugmented) {
+                const N = currentCols - 1;
+                const openBracket = useSquareBrackets ? '[' : '(';
+                const closeBracket = useSquareBrackets ? ']' : ')';
+                latexCode = `$$\n\\left${openBracket}\\begin{array}{@{}*{${N}}{c}|c@{}}\n    ${latexRows.join(' \\\\\n    ')}\n\\end{array}\\right${closeBracket}\n$$`;
+            } else {
+                const env = useSquareBrackets ? 'bmatrix' : 'pmatrix';
+                latexCode = `$$\n\\begin{${env}}\n    ${latexRows.join(' \\\\\n    ')}\n\\end{${env}}\n$$`;
+            }
+            
             outputCode.textContent = latexCode;
         }
 
