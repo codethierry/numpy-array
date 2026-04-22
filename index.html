@@ -19,14 +19,23 @@
             <div class="custom-dropdown" id="mode-dropdown">
                 <div class="dropdown-trigger" id="dropdown-trigger">
                     <span id="current-mode-text">NumPy</span>
-                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <path d="M6 9l6 6 6-6"/>
+                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="3">
+                        <path d="M6 9l6 6 6-6" />
                     </svg>
                 </div>
                 <div class="dropdown-menu" id="dropdown-menu">
                     <div class="dropdown-item active" data-value="numpy">NumPy</div>
                     <div class="dropdown-item" data-value="latex">LaTeX</div>
                 </div>
+            </div>
+
+            <!-- LaTeX Specific Options -->
+            <div id="latex-options" class="hidden">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="augmented-matrix">
+                    <span class="checkbox-label">Augmented Matrix (m | n)</span>
+                </label>
             </div>
         </div>
 
@@ -67,7 +76,9 @@
         </section>
 
         <section class="grid-section">
-            <div id="grid-container" class="grid-container"></div>
+            <div id="grid-wrapper" class="grid-wrapper">
+                <div id="grid-container" class="grid-container"></div>
+            </div>
             <button id="submit-btn" class="primary-btn" style="display: none;">Submit</button>
         </section>
 
@@ -87,7 +98,7 @@
         </section>
 
         <footer>
-            <p>&copy; Thierry Kall, 2026</p>
+            <p>&copy; Thierry Kall - 2026</p>
         </footer>
     </div>
     <script src="script.js"></script>

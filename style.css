@@ -122,8 +122,110 @@ body {
     color: var(--text-primary);
 }
 
-.dropdown-item.active {
-    display: none; /* Hide active item from the dropdown list */
+/* --- Augmented Grid Style --- */
+.grid-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.augmented-line {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background-color: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    /* Static centering: anchored to the wrapper's 50% mark via script.js */
+    transform: translateX(-50%); 
+}
+
+.grid-wrapper.augmented .augmented-line {
+    opacity: 1;
+}
+
+/* Subtle spreading animation for cells */
+.grid-cell {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 
+   FIX: Symmetrically shift entire blocks to keep internal spacing constant.
+   Using translate3d matches the base state to prevent vertical baseline jumps.
+*/
+.grid-wrapper.augmented-spread .grid-cell[data-col-type="left"] {
+    transform: translate3d(-10px, 0, 0);
+}
+
+.grid-wrapper.augmented-spread .grid-cell[data-col-type="right"] {
+    transform: translate3d(10px, 0, 0);
+}
+
+/* --- LaTeX Options --- */
+#latex-options {
+    display: flex;
+    align-items: center;
+    margin-left: 2rem;
+    padding-left: 2rem;
+    border-left: 1px solid var(--border-color);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.2rem;
+    height: 1.2rem;
+    background-color: #0b1120;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkbox-container input::before {
+    content: "";
+    width: 0.6rem;
+    height: 0.6rem;
+    transform: scale(0);
+    transition: 0.2s transform cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: white;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.checkbox-container input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-container input:checked::before {
+    transform: scale(1);
+}
+
+.checkbox-container input:hover {
+    border-color: var(--text-secondary);
+}
+
+.checkbox-container input:checked:hover {
+    background-color: var(--primary-hover);
+}
+
+.checkbox-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
 .hidden {
@@ -360,10 +462,12 @@ footer p {
     flex-direction: column;
     gap: 1.5rem;
     align-items: center;
+    width: 100%;
+    text-align: center;
 }
 
 .grid-container {
-    display: grid;
+    display: inline-grid;
     gap: 8px;
     background-color: var(--surface-color);
     padding: 1.5rem;
@@ -372,11 +476,34 @@ footer p {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
     max-width: 100%;
+    justify-self: center;
+    align-items: center;
+    position: relative; /* Line is now positioned relative to the container */
+    transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 
+   Expand the container padding when the cells spread out 
+   so the visual distance to the edge remains constant (1.5rem).
+*/
+.grid-wrapper.augmented-spread .grid-container {
+    padding-left: calc(1.5rem + 10px);
+    padding-right: calc(1.5rem + 10px);
 }
 
 .grid-cell {
     width: 100px;
     height: 50px;
+    display: inline-block;
+    vertical-align: middle;
+    /* 
+       IMPORTANT: Always maintain a transform context (translate3d).
+       This prevents the browser from shifting the text baseline when 
+       the augmentation animation (translateX) triggers.
+    */
+    transform: translate3d(0, 0, 0); 
+    will-change: transform;
+    padding: 0;
     text-align: center;
     font-size: 1.1rem;
     font-variant-numeric: tabular-nums;
@@ -384,7 +511,7 @@ footer p {
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .grid-cell:focus {
